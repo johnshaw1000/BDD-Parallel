@@ -1,6 +1,5 @@
 ﻿namespace BackgroundTaskTests.Steps
 {
-    using System;
     using System.Threading.Tasks;
     using NUnit.Framework;
     using PageObjects;
@@ -9,20 +8,20 @@
     [Binding]
     public class BackgroundTaskSteps
     {
+        private const string BackgroundTaskKey = "BackgroundTask";
+
         [Given(@"A background task")]
         public async Task GivenABackgroundTask()
         {
             var backgroundTask = new BackgroundTaskAsync();
-
-            var backgroundTaskKey = FeatureContext.Current.FeatureInfo.Title + "-BackgroundTask";
-
-            if (FeatureContext.Current.ContainsKey(backgroundTaskKey))
+            
+            if (FeatureContext.Current.ContainsKey(BackgroundTaskKey))
             {
-                FeatureContext.Current[backgroundTaskKey] = backgroundTask;
+                FeatureContext.Current[BackgroundTaskKey] = backgroundTask;
             }
             else
             {
-                FeatureContext.Current.Add(backgroundTaskKey, backgroundTask);
+                FeatureContext.Current.Add(BackgroundTaskKey, backgroundTask);
             }
 
             await Task.Yield();
@@ -42,27 +41,14 @@
         [Then(@"A valid response is detected after (.*) seconds")]
         public async Task ThenAValidResponseIsDetectedTask_Delay(int delaySeconds)
         {
-            var backgroundTaskKey = FeatureContext.Current.FeatureInfo.Title + "-BackgroundTask";
+            var task = PutTaskDelay(delaySeconds*1000);
+            task.Wait();
+            await task;
 
-            try
-            {
-                var task = PutTaskDelay(delaySeconds*1000);
-                task.Wait();
-                await task;
+            var backgroundTask = (BackgroundTaskAsync) FeatureContext.Current[BackgroundTaskKey];
 
-                var backgroundTask = (BackgroundTaskAsync)FeatureContext.Current[backgroundTaskKey];
-
-                if (backgroundTask != null)
-                {
-                    var x = backgroundTask.Result;
-                }
-
-                //Assert.IsTrue(backgroundTask.Result);
-            }
-            catch (Exception ex)
-            {
-                var message = ex.Message;
-            }
+            Assert.NotNull(backgroundTask);
+            Assert.IsTrue(backgroundTask.Result);
         }
 
         async Task PutTaskDelay(int delay)
