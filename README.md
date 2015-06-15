@@ -14,3 +14,15 @@ In SpecFlow this translates as features. Being limited to running features, rath
 There is a problem with SpecFlow. Though it does run in parallel, there appear to be some thread safety issues around context storage between steps.
 
 [Issue 448]( https://github.com/techtalk/SpecFlow/issues/448) is open for this on the TechTalk SpecFlow site.
+
+## Running
+
+### BackgroundTask
+
+This is a very simple RESTful web service that responds after a given duration (milliseconds). This needs to be running in VisualStudio or published to IIS. In theory is could be published to an Azure web role - I haven't tried.
+
+### BackgroundTaskTests
+
+These are SpecFlow features and scenarios to demonstrate running features in parallel.
+
+They don't do much, not much at all. But you will see three tests running at the same time - one for each feature file.
